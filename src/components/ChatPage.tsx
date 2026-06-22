@@ -224,9 +224,9 @@ const ChatPage = ({ id, initialMessages, onOpenSidebar }: ChatPageProps) => {
   };
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
+    <div className="h-full flex flex-col">
       {/* ── Unified sticky header ── */}
-      <header className="flex items-center h-14 px-3 border-b border-gray-800/40 bg-[#0d0c14] flex-shrink-0 z-10">
+      <header className="flex items-center h-12 px-3 border-b border-gray-800/40 bg-[#0d0c14] flex-shrink-0 z-10">
         {/* Hamburger — mobile only */}
         <button
           onClick={onOpenSidebar}
@@ -246,8 +246,8 @@ const ChatPage = ({ id, initialMessages, onOpenSidebar }: ChatPageProps) => {
       </header>
 
       {/* ── Scrollable messages ── */}
-      <div className="flex-1 overflow-y-auto scrollbar-hidden">
-        <div className="max-w-3xl mx-auto px-4 pt-8 pb-6">
+      <div className="flex-1 overflow-y-auto scrollbar-hidden min-h-0">
+        <div className="max-w-3xl mx-auto px-3 md:px-4 pt-6 pb-4">
           {/* Empty state */}
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center pt-20 pb-8 text-center select-none">
@@ -329,7 +329,7 @@ const ChatPage = ({ id, initialMessages, onOpenSidebar }: ChatPageProps) => {
       </div>
 
       {/* ── Fixed bottom: gradient + error + input ── */}
-      <div className="flex-shrink-0 relative">
+      <div className="flex-shrink-0 relative bg-[#0d0c14]">
         {/* Gradient fade over the last messages */}
         <div className="absolute -top-10 left-0 right-0 h-10 bg-gradient-to-t from-[#0d0c14] to-transparent pointer-events-none" />
 

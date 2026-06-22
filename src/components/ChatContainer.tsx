@@ -12,7 +12,7 @@ export default function ChatContainer({ id }: ChatContainerProps) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-[#0d0c14] overflow-hidden">
+    <div className="flex h-[100dvh] bg-[#0d0c14] overflow-hidden">
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-30 w-64 bg-[#13111f] border-r border-gray-800/60 transform transition-transform duration-300 ease-in-out
@@ -30,8 +30,8 @@ export default function ChatContainer({ id }: ChatContainerProps) {
         />
       )}
 
-      {/* Main content — no header here; ChatPage owns the header row */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      {/* Main content — flex-1 + overflow-hidden so ChatPage fills exactly this area */}
+      <main className="flex-1 min-w-0 overflow-hidden">
         <Chat
           id={id}
           initialMessages={[]}
