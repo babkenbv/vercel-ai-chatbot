@@ -30,8 +30,8 @@ export default function ChatContainer({ id }: ChatContainerProps) {
         />
       )}
 
-      {/* Main content — flex-1 + overflow-hidden so ChatPage fills exactly this area */}
-      <main className="flex-1 min-w-0 overflow-hidden">
+      {/* Main content — relative so ChatPage can use absolute inset-0 */}
+      <main className="flex-1 min-w-0 relative overflow-hidden">
         <Chat
           id={id}
           initialMessages={[]}
