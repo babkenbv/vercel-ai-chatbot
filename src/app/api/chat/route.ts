@@ -1,30 +1,42 @@
 import { google } from "@ai-sdk/google";
-import {
-  convertToCoreMessages,
-  type Experimental_LanguageModelV1Middleware,
-  generateText,
-  Message,
-  experimental_wrapLanguageModel as wrapLanguageModel,
-} from "ai";
-import { NextResponse } from "next/server";
+import { openai } from "@ai-sdk/openai";
+import { convertToCoreMessages, streamText, type Message } from "ai";
+
+function getModel(modelId: string) {
+  switch (modelId) {
+    case "gpt-5.5":
+      return openai("gpt-5.5");
+    case "gemini-2.5-flash":
+    default:
+      return google("gemini-2.5-flash");
+  }
+}
 
 export async function POST(request: Request) {
-  const { messages }: { id: string; messages: Array<Message> } =
-    await request.json();
+  try {
+    const {
+      messages,
+      model: modelId = "gemini-2.5-flash",
+    }: { id: string; messages: Array<Message>; model?: string } =
+      await request.json();
 
-  const coreMessages = convertToCoreMessages(messages).filter(
-    (message) => message.content.length > 0
-  );
+    const coreMessages = convertToCoreMessages(messages).filter(
+      (message) => message.content.length > 0
+    );
 
-  const result = await generateText({
-    model: wrapLanguageModel({
-      model: google("gemini-1.5-flash-latest"),
-      middleware: {} as Experimental_LanguageModelV1Middleware,
-    }),
-    system:
-      "You are a chemical expert. When a user asks for equations or tables of properties render them in the chat with a nice markdown",
-    messages: coreMessages,
-  });
+    const result = await streamText({
+      model: getModel(modelId),
+      system:
+        "You are a helpful AI assistant. When a user asks for data, equations, or properties, render them as well-formatted markdown tables or code blocks with language identifiers. Use proper markdown for all responses.",
+      messages: coreMessages,
+    });
 
-  return NextResponse.json(result.text);
+    return result.toDataStreamResponse();
+  } catch (error: any) {
+    console.error("[/api/chat] Error:", error?.message ?? error);
+    return new Response(
+      JSON.stringify({ error: error?.message ?? "Internal server error" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
 }

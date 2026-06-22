@@ -21,16 +21,24 @@ interface ChatContextProps {
 const ChatContext = createContext<ChatContextProps | undefined>(undefined);
 
 export const ChatProvider = ({ children }: { children: ReactNode }) => {
-  const [chats, setChats] = useState<{ [key: string]: Chat }>(() => {
-    if (typeof window !== "undefined") {
-      return JSON.parse(localStorage.getItem("chats") || "{}");
-    }
-    return {};
-  });
+  // Always start empty so server and client initial render match (avoids hydration mismatch).
+  // Load from localStorage only after mount.
+  const [chats, setChats] = useState<{ [key: string]: Chat }>({});
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("chats", JSON.stringify(chats));
-  }, [chats]);
+    const stored = localStorage.getItem("chats");
+    if (stored) {
+      setChats(JSON.parse(stored));
+    }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (hydrated) {
+      localStorage.setItem("chats", JSON.stringify(chats));
+    }
+  }, [chats, hydrated]);
 
   return (
     <ChatContext.Provider value={{ chats, setChats }}>

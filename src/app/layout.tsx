@@ -14,7 +14,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "DeepOrigin AI Chat",
+  title: "AI Chatbot",
 };
 
 export default function RootLayout({
