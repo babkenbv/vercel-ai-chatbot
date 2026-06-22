@@ -2,7 +2,6 @@
 
 import ChatList from "@/components/ChatList";
 import Chat from "@/components/ChatPage";
-import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
 interface ChatContainerProps {
@@ -31,29 +30,13 @@ export default function ChatContainer({ id }: ChatContainerProps) {
         />
       )}
 
-      {/* Main content */}
+      {/* Main content — no header here; ChatPage owns the header row */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Mobile top bar */}
-        <header className="flex md:hidden items-center px-4 py-3 border-b border-gray-800/60 bg-[#13111f] flex-shrink-0">
-          <button
-            onClick={() => setSidebarOpen(!isSidebarOpen)}
-            className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
-            aria-label="Toggle sidebar"
-          >
-            {isSidebarOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
-          </button>
-          <span className="ml-3 text-sm font-semibold text-gray-200 tracking-wide">
-            AI Chatbot
-          </span>
-        </header>
-
-        <div className="flex-1 overflow-hidden">
-          <Chat id={id} initialMessages={[]} />
-        </div>
+        <Chat
+          id={id}
+          initialMessages={[]}
+          onOpenSidebar={() => setSidebarOpen((o) => !o)}
+        />
       </main>
     </div>
   );

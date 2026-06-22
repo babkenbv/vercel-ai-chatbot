@@ -6,7 +6,7 @@ import { useAutoScroll } from "@/hooks/useAutoScroll";
 import { DEFAULT_MODEL_ID } from "@/lib/models";
 import { Message } from "ai";
 import { useChat } from "ai/react";
-import { Bot } from "lucide-react";
+import { Bot, Menu } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -17,6 +17,7 @@ import { useChatContext } from "../context/ChatContext";
 interface ChatPageProps {
   id: string;
   initialMessages: Message[];
+  onOpenSidebar?: () => void;
 }
 
 const MarkdownContent = ({ content }: { content: string }) => (
@@ -143,7 +144,7 @@ const MarkdownContent = ({ content }: { content: string }) => (
   </ReactMarkdown>
 );
 
-const ChatPage = ({ id, initialMessages }: ChatPageProps) => {
+const ChatPage = ({ id, initialMessages, onOpenSidebar }: ChatPageProps) => {
   const { setChats } = useChatContext();
 
   // Model selection — start with default to avoid SSR mismatch, hydrate from localStorage after mount
@@ -223,15 +224,30 @@ const ChatPage = ({ id, initialMessages }: ChatPageProps) => {
   };
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Top bar with model selector */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-800/60 flex-shrink-0">
-        <ModelSelector selectedModelId={selectedModel} onSelect={handleModelChange} />
-      </div>
+    <div className="h-full flex flex-col overflow-hidden">
+      {/* ── Unified sticky header ── */}
+      <header className="flex items-center h-14 px-3 border-b border-gray-800/40 bg-[#0d0c14] flex-shrink-0 z-10">
+        {/* Hamburger — mobile only */}
+        <button
+          onClick={onOpenSidebar}
+          className="md:hidden p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors mr-1"
+          aria-label="Open sidebar"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
 
-      {/* Messages area */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 scrollbar-hidden">
-        <div className="max-w-3xl mx-auto">
+        {/* Model selector — centered */}
+        <div className="flex-1 flex justify-center">
+          <ModelSelector selectedModelId={selectedModel} onSelect={handleModelChange} />
+        </div>
+
+        {/* Right-side spacer to keep model selector visually centred on mobile */}
+        <div className="md:hidden w-9" />
+      </header>
+
+      {/* ── Scrollable messages ── */}
+      <div className="flex-1 overflow-y-auto scrollbar-hidden">
+        <div className="max-w-3xl mx-auto px-4 pt-8 pb-6">
           {/* Empty state */}
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center pt-20 pb-8 text-center select-none">
@@ -308,36 +324,41 @@ const ChatPage = ({ id, initialMessages }: ChatPageProps) => {
               )}
           </div>
 
-          <div ref={bottomRef} className="h-2" />
+          <div ref={bottomRef} className="h-1" />
         </div>
       </div>
 
-      {/* Error banner */}
-      {apiError && (
-        <div className="mx-4 mb-2 flex items-start gap-2.5 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
-          <span className="mt-0.5 flex-shrink-0">⚠</span>
-          <span className="flex-1">{apiError}</span>
-          <button
-            onClick={() => setApiError(null)}
-            className="flex-shrink-0 text-red-500 hover:text-red-300 transition-colors text-lg leading-none"
-          >
-            ×
-          </button>
-        </div>
-      )}
+      {/* ── Fixed bottom: gradient + error + input ── */}
+      <div className="flex-shrink-0 relative">
+        {/* Gradient fade over the last messages */}
+        <div className="absolute -top-10 left-0 right-0 h-10 bg-gradient-to-t from-[#0d0c14] to-transparent pointer-events-none" />
 
-      {/* Input */}
-      <Prompt
-        input={input}
-        isLoading={isLoading}
-        handleSubmit={onSubmit}
-        stop={stop}
-        handleInputChange={(e) =>
-          handleInputChange(
-            e as unknown as React.ChangeEvent<HTMLInputElement>
-          )
-        }
-      />
+        {/* Error banner */}
+        {apiError && (
+          <div className="mx-4 mb-1 flex items-start gap-2.5 px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+            <span className="mt-0.5 flex-shrink-0">⚠</span>
+            <span className="flex-1">{apiError}</span>
+            <button
+              onClick={() => setApiError(null)}
+              className="flex-shrink-0 text-red-500 hover:text-red-300 transition-colors text-lg leading-none"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        <Prompt
+          input={input}
+          isLoading={isLoading}
+          handleSubmit={onSubmit}
+          stop={stop}
+          handleInputChange={(e) =>
+            handleInputChange(
+              e as unknown as React.ChangeEvent<HTMLInputElement>
+            )
+          }
+        />
+      </div>
     </div>
   );
 };

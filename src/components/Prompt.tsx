@@ -37,7 +37,7 @@ const Prompt = ({
   };
 
   return (
-    <div className="px-4 pb-4 pt-2 flex-shrink-0">
+    <div className="px-4 pb-4 pt-0 bg-[#0d0c14]">
       <form
         onSubmit={handleSubmit}
         className="max-w-3xl mx-auto bg-[#1e1b2e] border border-gray-700/60 rounded-2xl flex items-end gap-2 px-4 py-3 shadow-xl shadow-black/40 focus-within:border-violet-500/50 transition-colors duration-200"
